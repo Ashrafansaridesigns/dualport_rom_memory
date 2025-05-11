@@ -1,0 +1,62 @@
+`timescale 1ns / 1ps
+
+module memoryrom8bit_tb();
+
+  reg [2:0] addr1, addr2;
+  reg clk;
+  reg en1, en2;
+  wire [7:0] dout1, dout2;
+
+  // Instantiate the DUT
+  memoryrom8bit uut (
+    .addr1(addr1),
+    .addr2(addr2),
+    .clk(clk),
+    .en1(en1),
+    .en2(en2),
+    .dout1(dout1),
+    .dout2(dout2)
+  );
+
+  // Clock generation (10 ns period)
+  initial clk = 0;
+  always #5 clk = ~clk;
+
+  // Stimulus
+  initial begin
+    $display("Time\tEn1\tAddr1\tDout1\tEn2\tAddr2\tDout2");
+    $monitor("%0dns\t%b\t%b\t%h\t%b\t%b\t%h",
+              $time, en1, addr1, dout1, en2, addr2, dout2);
+
+    // Initialize
+    en1 = 0; en2 = 0;
+    addr1 = 3'b000; addr2 = 3'b000; #10;
+
+    // Enable both and apply first 4 addresses
+    en1 = 1; en2 = 1;
+
+    addr1 = 3'b000; addr2 = 3'b001; #10;
+    addr1 = 3'b010; addr2 = 3'b011; #10;
+    addr1 = 3'b100; addr2 = 3'b101; #10;
+    addr1 = 3'b110; addr2 = 3'b111; #10;
+
+    // Disable both, still change addresses
+    en1 = 0; en2 = 0;
+
+    addr1 = 3'b000; addr2 = 3'b001; #10;
+    addr1 = 3'b010; addr2 = 3'b011; #10;
+    addr1 = 3'b100; addr2 = 3'b101; #10;
+    addr1 = 3'b110; addr2 = 3'b111; #10;
+
+    // Re-enable and repeat
+    en1 = 1; en2 = 1;
+
+    addr1 = 3'b000; addr2 = 3'b001; #10;
+    addr1 = 3'b010; addr2 = 3'b011; #10;
+    addr1 = 3'b100; addr2 = 3'b101; #10;
+    addr1 = 3'b110; addr2 = 3'b111; #10;
+
+    $finish;
+  end
+
+endmodule
